@@ -1,43 +1,57 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Store, Delete, Lock } from 'lucide-react';
-import { useSettings } from '@/hooks/useSettings';
+import { Store, Delete, Lock, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
-
+import { Button } from '@/components/ui/button';
 
 export function Login() {
   const navigate = useNavigate();
   const { unlock, storeName } = useAuthStore();
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-
   const [loading, setLoading] = useState(false);
 
-const handleKey = async (key: string) => {
-  setError('');
-  if (key === 'del') { setPin((p) => p.slice(0, -1)); return; }
-  if (pin.length >= 6 || loading) return;
-  const newPin = pin + key;
-  setPin(newPin);
+  const handleKey = (key: string) => {
+    setError('');
+    if (loading) return;
 
-  if (newPin.length >= 4) {
+    if (key === 'del') {
+      setPin((p) => p.slice(0, -1));
+      return;
+    }
+    if (pin.length >= 6) return;
+    setPin((p) => p + key);
+  };
+
+  const handleSubmit = async () => {
+    if (pin.length < 4 || loading) return;
     setLoading(true);
+    setError('');
     try {
-      await unlock(newPin);
+      await unlock(pin);
       navigate('/pos');
-    } catch {
+    } catch (e: any) {
       setError('Wrong PIN. Try again.');
-      setTimeout(() => { setPin(''); setError(''); }, 1000);
+      setPin('');
+      setTimeout(() => setError(''), 1500);
     } finally {
       setLoading(false);
     }
-  }
-};
+  };
+
+  // Submit on Enter key
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && pin.length >= 4) handleSubmit();
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-slate-100 flex items-center justify-center p-4">
+    <div
+      className="min-h-screen bg-gradient-to-br from-sky-50 to-slate-100 flex items-center justify-center p-4"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+    >
       <div className="w-full max-w-sm">
         <div className="bg-card rounded-2xl shadow-xl p-8">
           {/* Logo */}
@@ -62,8 +76,13 @@ const handleKey = async (key: string) => {
               />
             ))}
           </div>
-          <div className="text-center text-sm text-destructive h-5 mb-4">
+          <div className="text-center text-sm text-destructive h-5 mb-2">
             {error}
+          </div>
+          <div className="text-center text-xs text-muted-foreground h-5 mb-4">
+            {pin.length >= 4 && pin.length < 6 && !loading
+              ? 'Press Enter or tap Login'
+              : '\u00A0'}
           </div>
 
           {/* Keypad */}
@@ -72,20 +91,23 @@ const handleKey = async (key: string) => {
               <button
                 key={key}
                 onClick={() => handleKey(key)}
-                className="h-16 rounded-xl bg-secondary hover:bg-secondary/70 active:scale-95 transition-all text-xl font-semibold flex items-center justify-center"
+                disabled={loading}
+                className="h-16 rounded-xl bg-secondary hover:bg-secondary/70 active:scale-95 transition-all text-xl font-semibold flex items-center justify-center disabled:opacity-50"
               >
                 {key}
               </button>
             ))}
             <button
               onClick={() => handleKey('del')}
-              className="h-16 rounded-xl hover:bg-muted active:scale-95 transition-all flex items-center justify-center text-muted-foreground"
+              disabled={loading}
+              className="h-16 rounded-xl hover:bg-muted active:scale-95 transition-all flex items-center justify-center text-muted-foreground disabled:opacity-50"
             >
               <Delete className="h-6 w-6" />
             </button>
             <button
               onClick={() => handleKey('0')}
-              className="h-16 rounded-xl bg-secondary hover:bg-secondary/70 active:scale-95 transition-all text-xl font-semibold flex items-center justify-center"
+              disabled={loading}
+              className="h-16 rounded-xl bg-secondary hover:bg-secondary/70 active:scale-95 transition-all text-xl font-semibold flex items-center justify-center disabled:opacity-50"
             >
               0
             </button>
@@ -93,6 +115,31 @@ const handleKey = async (key: string) => {
               <Lock className="h-5 w-5 text-muted-foreground" />
             </div>
           </div>
+
+          {/* Login button */}
+          <Button
+            onClick={handleSubmit}
+            disabled={pin.length < 4 || loading}
+            className="w-full h-12 mt-4 text-base"
+          >
+            {loading ? (
+              'Checking...'
+            ) : (
+              <>
+                <Check className="h-5 w-5 mr-2" />
+                Login
+              </>
+            )}
+          </Button>
+
+          {pin.length > 0 && !loading && (
+            <button
+              onClick={() => setPin('')}
+              className="w-full text-center text-xs text-muted-foreground mt-3 hover:text-foreground"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
     </div>
