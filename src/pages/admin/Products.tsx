@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Search, Star, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Search, Star, Pencil, Trash2, X, Camera } from 'lucide-react';
 import { useProducts, useCategories, useCreateProduct, useUpdateProduct, useDeleteProduct, useToggleFavorite } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import { Scanner } from '@/components/pos/ScannerModal';
 import { formatCurrency } from '@/utils/format';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -159,6 +160,7 @@ function ProductForm({
   const [unit, setUnit] = useState(product?.unit || 'pc');
   const [categoryId, setCategoryId] = useState(product?.category_id || '');
   const [lowStock, setLowStock] = useState(product?.low_stock_threshold?.toString() || '5');
+  const [scanOpen, setScanOpen] = useState(false);
 
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -192,10 +194,33 @@ function ProductForm({
             <label className="text-xs font-medium text-muted-foreground">Name</label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Product name" autoFocus />
           </div>
+
+          {/* Barcode with scan button */}
           <div>
             <label className="text-xs font-medium text-muted-foreground">Barcode</label>
-            <Input value={barcode} onChange={(e) => setBarcode(e.target.value)} placeholder="Barcode (optional)" />
+            <div className="flex gap-2">
+              <Input
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                placeholder="Barcode (optional)"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setScanOpen(true)}
+                aria-label="Scan barcode"
+                className="shrink-0 h-9 w-9"
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Tap the camera to scan, or type the barcode manually
+            </p>
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-muted-foreground">Price (PHP)</label>
@@ -206,6 +231,7 @@ function ProductForm({
               <Input value={cost} onChange={(e) => setCost(e.target.value)} type="number" inputMode="decimal" placeholder="0.00" />
             </div>
           </div>
+
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-medium text-muted-foreground">Stock</label>
@@ -220,6 +246,7 @@ function ProductForm({
               <Input value={lowStock} onChange={(e) => setLowStock(e.target.value)} type="number" inputMode="numeric" placeholder="5" />
             </div>
           </div>
+
           <div>
             <label className="text-xs font-medium text-muted-foreground">Category</label>
             <select
@@ -241,6 +268,18 @@ function ProductForm({
             {saving ? 'Saving...' : 'Save'}
           </Button>
         </div>
+
+        {/* Barcode scanner modal */}
+        <Scanner
+          open={scanOpen}
+          onClose={() => setScanOpen(false)}
+          onScan={(code) => {
+            setBarcode(code);
+            setScanOpen(false);
+            toast.success(`Barcode captured: ${code}`);
+          }}
+          title="Scan Product Barcode"
+        />
       </div>
     </div>
   );
