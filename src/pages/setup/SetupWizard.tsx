@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store, ArrowRight, Check } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { useInitSettings, useSettings } from '@/hooks/useSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useSettings } from '@/hooks/useSettings';
+
 
 export function SetupWizard() {
   const navigate = useNavigate();
   const { setup } = useAuthStore();
-  const initSettings = useInitSettings();
   const { data: existingSettings } = useSettings();
   const [step, setStep] = useState(0);
   const [storeName, setStoreName] = useState('');
@@ -38,24 +38,14 @@ export function SetupWizard() {
   };
 
   const handleFinish = async () => {
-    try {
-      if (existingSettings) {
-        // Settings already exist, just mark setup done
-        setup(storeName || existingSettings.store_name, ownerName || existingSettings.owner_name || '');
-        navigate('/login');
-        return;
-      }
-      await initSettings.mutateAsync({
-        storeName: storeName.trim(),
-        ownerName: ownerName.trim(),
-        pin,
-      });
-      setup(storeName.trim(), ownerName.trim());
-      navigate('/login');
-    } catch (e: any) {
-      toast.error(e.message || 'Setup failed');
-    }
-  };
+  try {
+    await setup(storeName.trim(), ownerName.trim(), pin);
+    toast.success('Store created!');
+    navigate('/pos');
+  } catch (e: any) {
+    toast.error(e?.response?.data?.error || e.message || 'Setup failed');
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-slate-100 flex items-center justify-center p-4">
@@ -161,9 +151,9 @@ export function SetupWizard() {
                 </p>
               </div>
               <Button onClick={handleFinish} className="w-full h-12 text-base">
-                {initSettings.isPending ? 'Saving...' : 'Start Selling'}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+  Start Selling
+  <ArrowRight className="h-4 w-4 ml-2" />
+</Button>
             </div>
           )}
         </div>

@@ -1,40 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store, Delete, Lock } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore';
+
 
 export function Login() {
   const navigate = useNavigate();
   const { unlock, storeName } = useAuthStore();
-  const { data: settings } = useSettings();
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
 
-  const handleKey = (key: string) => {
-    setError('');
-    if (key === 'del') {
-      setPin((p) => p.slice(0, -1));
-      return;
+  const [loading, setLoading] = useState(false);
+
+const handleKey = async (key: string) => {
+  setError('');
+  if (key === 'del') { setPin((p) => p.slice(0, -1)); return; }
+  if (pin.length >= 6 || loading) return;
+  const newPin = pin + key;
+  setPin(newPin);
+
+  if (newPin.length >= 4) {
+    setLoading(true);
+    try {
+      await unlock(newPin);
+      navigate('/pos');
+    } catch {
+      setError('Wrong PIN. Try again.');
+      setTimeout(() => { setPin(''); setError(''); }, 1000);
+    } finally {
+      setLoading(false);
     }
-    if (pin.length >= 6) return;
-    const newPin = pin + key;
-    setPin(newPin);
-    if (newPin.length >= 4) {
-      if (settings && newPin === settings.pin) {
-        unlock();
-        navigate('/pos');
-      } else if (newPin.length === (settings?.pin.length || 4)) {
-        setError('Wrong PIN. Try again.');
-        setTimeout(() => {
-          setPin('');
-          setError('');
-        }, 1000);
-      }
-    }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-slate-100 flex items-center justify-center p-4">

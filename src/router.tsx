@@ -33,20 +33,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   const isSetup = useAuthStore((s) => s.isSetup);
   const isLocked = useAuthStore((s) => s.isLocked);
-  const { data: settings, isLoading } = useSettings();
-  const setup = useAuthStore((s) => s.setup);
+  const token = useAuthStore((s) => s.token);
+  const checkSetup = useAuthStore((s) => s.checkSetup);
+  const loadMe = useAuthStore((s) => s.loadMe);
   const [checked, setChecked] = useState(false);
 
-  // Check if settings already exist (returning user)
   useEffect(() => {
-    if (isLoading) return;
-    if (settings && !isSetup) {
-      setup(settings.store_name, settings.owner_name || '');
-    }
-    setChecked(true);
-  }, [settings, isLoading, isSetup, setup]);
+    (async () => {
+      await checkSetup();
+      await loadMe();
+      setChecked(true);
+    })();
+  }, [checkSetup, loadMe]);
 
-  if (isLoading || !checked) {
+  if (!checked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-muted-foreground">Loading...</div>
@@ -54,12 +54,8 @@ function AppRoutes() {
     );
   }
 
-  if (!isSetup) {
-    return <SetupWizard />;
-  }
-  if (isLocked) {
-    return <Login />;
-  }
+  if (!isSetup) return <SetupWizard />;
+  if (isLocked || !token) return <Login />;
 
   return (
     <>
@@ -68,7 +64,6 @@ function AppRoutes() {
     </>
   );
 }
-
 export const router = createBrowserRouter([
   {
     path: '/setup',
