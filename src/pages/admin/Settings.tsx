@@ -17,7 +17,6 @@ export function Settings() {
   const [form, setForm] = useState({
     store_name: '',
     owner_name: '',
-    pin: '',
     gcash_number: '',
     maya_number: '',
     receipt_header: '',
@@ -31,7 +30,6 @@ export function Settings() {
       setForm({
         store_name: settings.store_name || '',
         owner_name: settings.owner_name || '',
-        pin: settings.pin || '',
         gcash_number: settings.gcash_number || '',
         maya_number: settings.maya_number || '',
         receipt_header: settings.receipt_header || '',
@@ -62,10 +60,8 @@ export function Settings() {
   const handleSave = async () => {
     try {
       await updateSettings.mutateAsync({
-        id: settings.id,
         store_name: form.store_name,
         owner_name: form.owner_name,
-        pin: form.pin,
         gcash_number: form.gcash_number || null,
         maya_number: form.maya_number || null,
         receipt_header: form.receipt_header || null,
@@ -113,17 +109,6 @@ export function Settings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div>
-            <Label>PIN</Label>
-            <Input
-              value={form.pin}
-              onChange={(e) => setForm({ ...form, pin: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-              type="password"
-              inputMode="numeric"
-              className="tracking-widest"
-              placeholder="4-6 digit PIN"
-            />
-          </div>
           <div>
             <Label>Idle Lock Timeout (minutes)</Label>
             <Input

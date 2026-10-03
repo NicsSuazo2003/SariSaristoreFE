@@ -32,7 +32,7 @@ export function Dashboard() {
     { label: 'Low Stock Items', value: data.lowStockCount.toString(), icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10' },
   ];
 
-  const chartData = data.dailyData.map((d) => ({
+  const chartData = data.dailyData.map((d: { date: string; total: number }) => ({
     date: new Date(d.date).toLocaleDateString('en-PH', { weekday: 'short' }),
     total: d.total,
   }));
