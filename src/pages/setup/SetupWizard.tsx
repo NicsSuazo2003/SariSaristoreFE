@@ -5,13 +5,12 @@ import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { useSettings } from '@/hooks/useSettings';
 
 
 export function SetupWizard() {
   const navigate = useNavigate();
   const { setup } = useAuthStore();
-  const { data: existingSettings } = useSettings();
+  
   const [step, setStep] = useState(0);
   const [storeName, setStoreName] = useState('');
   const [ownerName, setOwnerName] = useState('');

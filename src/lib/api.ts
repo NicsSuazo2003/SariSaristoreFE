@@ -17,9 +17,22 @@ api.interceptors.response.use(
   (r) => r,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('pos-token');
+      const url = error.config?.url ?? '';
       const path = window.location.pathname;
-      if (path !== '/login' && path !== '/setup') {
+
+      // Don't redirect for public/auth-check endpoints
+      const isPublicEndpoint =
+        url.includes('/api/auth/needs-setup') ||
+        url.includes('/api/auth/setup') ||
+        url.includes('/api/auth/login') ||
+        url.includes('/api/auth/me') ||
+        url.includes('/api/settings');
+
+      // Don't redirect if already on setup/login
+      const isAuthPage = path === '/setup' || path === '/login';
+
+      if (!isPublicEndpoint && !isAuthPage) {
+        localStorage.removeItem('pos-token');
         window.location.href = '/login';
       }
     }
