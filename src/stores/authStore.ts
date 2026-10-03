@@ -29,13 +29,15 @@ export const useAuthStore = create<AuthState>()(
       storeName: 'Sari-Sari Store',
       ownerName: '',
 
-      checkSetup: async () => {
+           checkSetup: async () => {
         try {
           const { data } = await api.get<{ needsSetup: boolean }>('/api/auth/needs-setup');
           const isSetup = !data.needsSetup;
           set({ isSetup });
           return isSetup;
-        } catch {
+        } catch (err) {
+          console.error('[checkSetup] Failed:', err);
+          set({ isSetup: false }); // fail-safe: assume setup needed
           return false;
         }
       },
@@ -100,13 +102,13 @@ export const useAuthStore = create<AuthState>()(
         }
       },
     }),
-    {
+       {
       name: 'pos-auth',
+      // Do NOT persist isSetup — always re-check with backend
       partialize: (s) => ({
-        isSetup: s.isSetup,
         storeName: s.storeName,
         ownerName: s.ownerName,
       }),
-    }
+    } 
   )
 );
