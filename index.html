@@ -3,13 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sari-Sari POS Frontend</title>
+
+    <!-- Viewport: Enables safe-area insets & keyboard resize handling -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+
+    <title>Sari-Sari POS</title>
+
+    <!-- Mobile Web App & PWA Status Bar Configuration -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SariSari POS" />
+
+    <!-- Theme Colors (Adapts to mobile OS status bars) -->
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+
+    <!-- Prevent automatic phone number auto-detection in price/stock text -->
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Social & Meta -->
+    <meta property="og:title" content="Sari-Sari POS" />
+    <meta property="og:description" content="Fast, mobile-ready point of sale system for sari-sari stores" />
     <meta property="og:image" content="https://bolt.new/static/og_default.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
   </head>
-  <body>
+  <body class="bg-background text-foreground antialiased selection:bg-primary/20">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

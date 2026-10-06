@@ -66,15 +66,46 @@
   * {
     @apply border-border;
   }
+  
+  html, body {
+    height: 100%;
+    /* Disable overscroll bouncing that breaks fixed full-screen apps on iOS */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Prevent accidental text highlighting during fast repetitive taps */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Keep text selection enabled inside inputs and receipt displays */
+  input, textarea, .selectable-text {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* Remove 300ms mobile touch delay */
+  button, a, input, select {
+    touch-action: manipulation;
   }
 }
 
-/* Smooth scrolling for mobile */
-* {
-  -webkit-overflow-scrolling: touch;
+/* Tabular numbers for clean price alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide scrollbars on horizontal category lists while retaining touch scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Print styles for receipts */
@@ -95,9 +126,4 @@
   .no-print {
     display: none !important;
   }
-}
-
-/* Tabular numbers for prices */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
 }
