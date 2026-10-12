@@ -205,12 +205,21 @@ export interface ApiSettings {
   currency: string;
 }
 
+export type UserRole = 'Owner' | 'Cashier';
+
 export interface ApiUser {
   id: string;
   name: string;
   storeName: string;
+  storeCode: string;
   storeAddress: string | null;
   phone: string | null;
+  role: UserRole;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: ApiUser;
 }
 
 export interface PagedResult<T> {
