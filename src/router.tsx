@@ -11,9 +11,10 @@ import { Customers } from '@/pages/admin/Customers';
 import { Sales } from '@/pages/admin/Sales';
 import { Reports } from '@/pages/admin/Reports';
 import { Settings } from '@/pages/admin/Settings';
+import { SuperAdminDashboard } from '@/pages/admin/SuperAdminDashboard';
+import { SuperAdminOnboard } from '@/pages/admin/SuperAdminOnboard';
 import { NotFound } from '@/pages/NotFound';
 import { useAuthStore } from '@/stores/authStore';
-import { useSettings } from '@/hooks/useSettings';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 
@@ -21,12 +22,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isSetup = useAuthStore((s) => s.isSetup);
   const isLocked = useAuthStore((s) => s.isLocked);
 
-  if (!isSetup) {
-    return <Navigate to="/setup" replace />;
-  }
-  if (isLocked) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!isSetup) return <Navigate to="/setup" replace />;
+  if (isLocked) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
@@ -34,6 +31,7 @@ function AppRoutes() {
   const isSetup = useAuthStore((s) => s.isSetup);
   const isLocked = useAuthStore((s) => s.isLocked);
   const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const checkSetup = useAuthStore((s) => s.checkSetup);
   const loadMe = useAuthStore((s) => s.loadMe);
   const [checked, setChecked] = useState(false);
@@ -57,6 +55,8 @@ function AppRoutes() {
   if (!isSetup) return <SetupWizard />;
   if (isLocked || !token) return <Login />;
 
+  const defaultLanding = user?.role === 'PlatformAdmin' ? '/admin' : '/pos';
+
   return (
     <>
       <AppShell />
@@ -64,62 +64,31 @@ function AppRoutes() {
     </>
   );
 }
+
 export const router = createBrowserRouter([
-  {
-    path: '/setup',
-    element: <SetupWizard />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
+  { path: '/setup', element: <SetupWizard /> },
+  { path: '/login', element: <Login /> },
   {
     element: <AppRoutes />,
     children: [
-      {
-        path: '/pos',
-        element: <ProtectedRoute><POS /></ProtectedRoute>,
-      },
-      {
-        path: '/dashboard',
-        element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
-      },
-      {
-        path: '/products',
-        element: <ProtectedRoute><Products /></ProtectedRoute>,
-      },
-      {
-        path: '/categories',
-        element: <ProtectedRoute><Categories /></ProtectedRoute>,
-      },
-      {
-        path: '/inventory',
-        element: <ProtectedRoute><Inventory /></ProtectedRoute>,
-      },
-      {
-        path: '/customers',
-        element: <ProtectedRoute><Customers /></ProtectedRoute>,
-      },
-      {
-        path: '/sales',
-        element: <ProtectedRoute><Sales /></ProtectedRoute>,
-      },
-      {
-        path: '/reports',
-        element: <ProtectedRoute><Reports /></ProtectedRoute>,
-      },
-      {
-        path: '/settings',
-        element: <ProtectedRoute><Settings /></ProtectedRoute>,
-      },
-      {
-        path: '/',
-        element: <Navigate to="/pos" replace />,
-      },
-      {
-        path: '*',
-        element: <NotFound />,
-      },
+      // ── POS / Store Owner routes ────────────────
+      { path: '/pos',        element: <ProtectedRoute><POS /></ProtectedRoute> },
+      { path: '/dashboard',  element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+      { path: '/products',   element: <ProtectedRoute><Products /></ProtectedRoute> },
+      { path: '/categories', element: <ProtectedRoute><Categories /></ProtectedRoute> },
+      { path: '/inventory',  element: <ProtectedRoute><Inventory /></ProtectedRoute> },
+      { path: '/customers',  element: <ProtectedRoute><Customers /></ProtectedRoute> },
+      { path: '/sales',      element: <ProtectedRoute><Sales /></ProtectedRoute> },
+      { path: '/reports',    element: <ProtectedRoute><Reports /></ProtectedRoute> },
+      { path: '/settings',   element: <ProtectedRoute><Settings /></ProtectedRoute> },
+
+      // ── Super Admin routes ──────────────────────
+      { path: '/admin',          element: <ProtectedRoute><SuperAdminDashboard /></ProtectedRoute> },
+      { path: '/admin/onboard',  element: <ProtectedRoute><SuperAdminOnboard /></ProtectedRoute> },
+
+      // ── Root + fallback ─────────────────────────
+      { path: '/', element: <Navigate to="/pos" replace /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ]);

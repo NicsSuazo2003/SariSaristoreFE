@@ -205,7 +205,9 @@ export interface ApiSettings {
   currency: string;
 }
 
-export type UserRole = 'Owner' | 'Cashier';
+
+
+export type UserRole = 'Owner' | 'Cashier' | 'PlatformAdmin';
 
 export interface ApiUser {
   id: string;
@@ -215,6 +217,36 @@ export interface ApiUser {
   storeAddress: string | null;
   phone: string | null;
   role: UserRole;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: ApiUser;
+}
+
+// ── Super Admin DTOs ────────────────────────────────
+export interface StoreSummary {
+  id: string;
+  code: string;
+  name: string;
+  createdAt: string;
+  userCount: number;
+  productCount: number;
+  saleCount: number;
+}
+
+export interface CreateStoreRequest {
+  storeName: string;
+  ownerName: string;
+  ownerPin: string;
+}
+
+export interface CreateStoreResponse {
+  storeId: string;
+  storeCode: string;
+  storeName: string;
+  ownerUserId: string;
+  ownerName: string;
 }
 
 export interface AuthResponse {

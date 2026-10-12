@@ -26,7 +26,7 @@ export function Login() {
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
 
-  // If savedStoreCode changes (e.g. after logout), re-sync
+  // Re-sync when savedStoreCode changes (e.g., after logout)
   useEffect(() => {
     if (savedStoreCode) {
       setStoreCodeInput(savedStoreCode);
@@ -55,7 +55,10 @@ export function Login() {
       try {
         await unlock(storeCodeInput.trim().toUpperCase(), value);
         triggerHaptic([30, 40, 30]);
-        navigate('/pos');
+
+        // ⭐ Role-based landing
+        const role = useAuthStore.getState().user?.role;
+        navigate(role === 'PlatformAdmin' ? '/admin' : '/pos');
       } catch (e: any) {
         triggerHaptic([60, 50, 60]);
         setError('Wrong PIN. Try again.');
@@ -70,7 +73,7 @@ export function Login() {
     [pin, loading, unlock, navigate, storeCodeInput],
   );
 
-  // ── Handle store code submission ───────────────────
+  // ── Submit store code ─────────────────────────────
   const handleCodeSubmit = () => {
     const code = storeCodeInput.trim().toUpperCase();
     if (code.length < 4) {
@@ -82,7 +85,7 @@ export function Login() {
     setMode('pin');
   };
 
-  // ── Keypad handler ─────────────────────────────────
+  // ── Keypad handler ────────────────────────────────
   const handleKey = useCallback(
     (key: string) => {
       setError('');
@@ -101,6 +104,7 @@ export function Login() {
       setPin((prev) => {
         if (prev.length >= 6) return prev;
         const next = prev + key;
+        // Auto-submit 6-digit PINs
         if (next.length === 6) {
           setTimeout(() => handleSubmit(next), 50);
         }
@@ -110,10 +114,9 @@ export function Login() {
     [loading, handleSubmit],
   );
 
-  // Global keyboard listener (numpad / desktop)
+  // ── Global keyboard listener (num pad / desktop) ──
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      // Only listen for digits when in PIN mode
       if (mode !== 'pin') return;
       if (loading) return;
 
@@ -146,7 +149,7 @@ export function Login() {
             </p>
           </div>
 
-          {/* ── MODE: Store Code Entry ─────────────────── */}
+          {/* ── MODE: Store Code Entry ───────────────── */}
           {mode === 'code' && (
             <div className="space-y-4">
               <div className="space-y-1">
@@ -161,7 +164,9 @@ export function Login() {
                     )
                   }
                   onKeyDown={(e) =>
-                    e.key === 'Enter' && storeCodeInput.length >= 4 && handleCodeSubmit()
+                    e.key === 'Enter' &&
+                    storeCodeInput.length >= 4 &&
+                    handleCodeSubmit()
                   }
                   placeholder="e.g., SARY4BP"
                   autoFocus
@@ -201,16 +206,19 @@ export function Login() {
                   }}
                   className="text-xs text-muted-foreground hover:text-foreground w-full text-center"
                 >
-                  Use saved store: <span className="font-mono font-semibold">{savedStoreCode}</span>
+                  Use saved store:{' '}
+                  <span className="font-mono font-semibold">
+                    {savedStoreCode}
+                  </span>
                 </button>
               )}
             </div>
           )}
 
-          {/* ── MODE: PIN Entry ────────────────────────── */}
+          {/* ── MODE: PIN Entry ──────────────────────── */}
           {mode === 'pin' && (
             <>
-              {/* Back link (only when user can change store) */}
+              {/* Back link — switch store code */}
               <button
                 type="button"
                 onClick={() => {
@@ -221,7 +229,8 @@ export function Login() {
                 className="mb-4 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 font-medium mx-auto"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
-                Store: <span className="font-mono font-bold">{storeCodeInput}</span>
+                Store:{' '}
+                <span className="font-mono font-bold">{storeCodeInput}</span>
               </button>
 
               {/* PIN Indicators */}
@@ -245,7 +254,7 @@ export function Login() {
                 ))}
               </div>
 
-              {/* Error text */}
+              {/* Error message */}
               <div className="text-center text-xs font-semibold text-destructive h-5 mb-2">
                 {error || '\u00A0'}
               </div>
@@ -264,6 +273,7 @@ export function Login() {
                   </button>
                 ))}
 
+                {/* Clear All */}
                 <button
                   type="button"
                   onClick={() => handleKey('clear')}
@@ -272,9 +282,12 @@ export function Login() {
                   aria-label="Clear all"
                 >
                   <RotateCcw className="h-5 w-5" />
-                  <span className="text-[10px] font-semibold mt-0.5">Clear</span>
+                  <span className="text-[10px] font-semibold mt-0.5">
+                    Clear
+                  </span>
                 </button>
 
+                {/* Zero */}
                 <button
                   type="button"
                   onClick={() => handleKey('0')}
@@ -284,6 +297,7 @@ export function Login() {
                   0
                 </button>
 
+                {/* Backspace */}
                 <button
                   type="button"
                   onClick={() => handleKey('del')}

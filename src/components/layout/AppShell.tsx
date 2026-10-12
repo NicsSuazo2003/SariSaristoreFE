@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useMediaQuery';
+import { AdminShell } from './AdminShell';
 
 type NavItem = {
   to: string;
@@ -40,6 +41,11 @@ export function AppShell() {
   const cartCount = useCartStore((s) => s.getItemCount());
   const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
+    // ── Role-based shell branch ────────────────────
+  const userRole = useAuthStore((s) => s.user?.role);
+  if (userRole === 'PlatformAdmin') {
+    return <AdminShell />;
+  }
 
   const primaryItems = navItems.filter((i) => i.primary);
   const secondaryItems = navItems.filter((i) => !i.primary);
