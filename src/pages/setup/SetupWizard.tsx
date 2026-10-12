@@ -84,8 +84,8 @@ export function SetupWizard() {
               <Store className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-center text-foreground">
-              Sari-Sari Store POS
-            </h1>
+  Kita
+</h1>
             <p className="text-xs text-muted-foreground mt-0.5">
               {step === 3 ? 'Setup Complete' : 'Initial Store Setup'}
             </p>

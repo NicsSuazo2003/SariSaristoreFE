@@ -140,7 +140,7 @@ export function Login() {
               <Store className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-center text-foreground">
-              {storeName || 'Sari-Sari Store POS'}
+              {storeName || 'Kita'}
             </h1>
             <p className="text-xs text-muted-foreground mt-1">
               {mode === 'code'

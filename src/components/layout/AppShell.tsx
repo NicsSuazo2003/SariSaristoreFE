@@ -60,7 +60,8 @@ export function AppShell() {
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <Store className="h-4 w-4 text-primary" />
             </div>
-            <span className="font-bold text-sm truncate">{storeName || 'Sari-Sari POS'}</span>
+            <span className="font-bold text-sm truncate">{storeName || 'Kita'}</span>
+
           </div>
           <button
             type="button"
@@ -188,7 +189,7 @@ export function AppShell() {
             <Store className="h-5 w-5 text-primary-foreground" />
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-sm truncate">{storeName || 'Sari-Sari POS'}</div>
+            <div className="font-bold text-sm truncate">{storeName || 'Kita'}</div>
             <div className="text-xs text-muted-foreground">Register Panel</div>
           </div>
         </div>
