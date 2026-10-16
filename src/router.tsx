@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { DemoShell } from '@/components/layout/DemoShell';
+import { DemoModeProvider } from '@/contexts/DemoModeContext';
 import { DemoLanding } from '@/pages/demo/DemoLanding';
 import { DemoPOS } from '@/pages/demo/DemoPOS';
 import { SetupWizard } from '@/pages/setup/SetupWizard';
@@ -67,13 +68,28 @@ function AppRoutes() {
 }
 
 export const router = createBrowserRouter([
-  // ── DEMO (public — no auth) ──────────────────
+  // ── DEMO (public, no auth) ───────────────────
   {
     path: '/demo',
-    element: <DemoShell />,
+    element: <DemoLanding />,
+  },
+  {
+    path: '/demo',
+    element: (
+      <DemoModeProvider>
+        <DemoShell />
+      </DemoModeProvider>
+    ),
     children: [
-      { index: true,      element: <DemoLanding /> },
-      { path: 'pos',      element: <DemoPOS /> },
+      { path: 'pos',         element: <DemoPOS /> },
+      { path: 'dashboard',   element: <Dashboard /> },
+      { path: 'products',    element: <Products /> },
+      { path: 'categories',  element: <Categories /> },
+      { path: 'inventory',   element: <Inventory /> },
+      { path: 'customers',   element: <Customers /> },
+      { path: 'sales',       element: <Sales /> },
+      { path: 'reports',     element: <Reports /> },
+      { path: 'settings',    element: <Settings /> },
     ],
   },
 
@@ -81,7 +97,7 @@ export const router = createBrowserRouter([
   { path: '/setup', element: <SetupWizard /> },
   { path: '/login', element: <Login /> },
 
-  // ── Main app (with auth gate) ────────────────
+  // ── Main app ─────────────────────────────────
   {
     element: <AppRoutes />,
     children: [
