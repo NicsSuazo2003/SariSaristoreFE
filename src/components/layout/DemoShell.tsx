@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { X, Mail, Sparkles, ArrowRight, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useDemoCartStore } from '@/stores/demoCartStore';
 
 export function DemoShell() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [signupOpen, setSignupOpen] = useState(false);
+
+  // The POS route needs a fixed, non-scrolling layout.
+  // The landing route should scroll naturally.
+  const isPOS = location.pathname.startsWith('/demo/pos');
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden bg-background">
@@ -39,8 +43,8 @@ export function DemoShell() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      {/* Content — POS locks scroll, landing scrolls */}
+      <div className={isPOS ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
         <Outlet />
       </div>
 
@@ -54,7 +58,6 @@ export function DemoShell() {
             className="bg-card rounded-3xl shadow-2xl border border-border w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="relative bg-gradient-to-br from-primary/15 via-primary/10 to-transparent px-6 pt-6 pb-4">
               <button
                 type="button"
@@ -76,7 +79,6 @@ export function DemoShell() {
               </p>
             </div>
 
-            {/* Body */}
             <div className="px-6 pb-6 space-y-3">
               <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
