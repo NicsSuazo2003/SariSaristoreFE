@@ -135,6 +135,15 @@ export function SetupWizard() {
                 Continue
                 <ArrowRight className="h-4 w-4 ml-1.5" />
               </Button>
+
+              <div className="text-center pt-1">
+  <a
+    href="/demo"
+    className="text-xs text-muted-foreground hover:text-primary font-medium inline-flex items-center gap-1"
+  >
+     Try the demo first
+  </a>
+</div>
             </div>
           )}
 

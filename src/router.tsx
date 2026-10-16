@@ -1,5 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
+import { DemoShell } from '@/components/layout/DemoShell';
+import { DemoLanding } from '@/pages/demo/DemoLanding';
+import { DemoPOS } from '@/pages/demo/DemoPOS';
 import { SetupWizard } from '@/pages/setup/SetupWizard';
 import { Login } from '@/pages/auth/Login';
 import { POS } from '@/pages/pos/POS';
@@ -55,8 +58,6 @@ function AppRoutes() {
   if (!isSetup) return <SetupWizard />;
   if (isLocked || !token) return <Login />;
 
-  const defaultLanding = user?.role === 'PlatformAdmin' ? '/admin' : '/pos';
-
   return (
     <>
       <AppShell />
@@ -66,12 +67,24 @@ function AppRoutes() {
 }
 
 export const router = createBrowserRouter([
+  // ── DEMO (public — no auth) ──────────────────
+  {
+    path: '/demo',
+    element: <DemoShell />,
+    children: [
+      { index: true,      element: <DemoLanding /> },
+      { path: 'pos',      element: <DemoPOS /> },
+    ],
+  },
+
+  // ── Auth ─────────────────────────────────────
   { path: '/setup', element: <SetupWizard /> },
   { path: '/login', element: <Login /> },
+
+  // ── Main app (with auth gate) ────────────────
   {
     element: <AppRoutes />,
     children: [
-      // ── POS / Store Owner routes ────────────────
       { path: '/pos',        element: <ProtectedRoute><POS /></ProtectedRoute> },
       { path: '/dashboard',  element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
       { path: '/products',   element: <ProtectedRoute><Products /></ProtectedRoute> },
@@ -82,11 +95,9 @@ export const router = createBrowserRouter([
       { path: '/reports',    element: <ProtectedRoute><Reports /></ProtectedRoute> },
       { path: '/settings',   element: <ProtectedRoute><Settings /></ProtectedRoute> },
 
-      // ── Super Admin routes ──────────────────────
       { path: '/admin',          element: <ProtectedRoute><SuperAdminDashboard /></ProtectedRoute> },
       { path: '/admin/onboard',  element: <ProtectedRoute><SuperAdminOnboard /></ProtectedRoute> },
 
-      // ── Root + fallback ─────────────────────────
       { path: '/', element: <Navigate to="/pos" replace /> },
       { path: '*', element: <NotFound /> },
     ],
